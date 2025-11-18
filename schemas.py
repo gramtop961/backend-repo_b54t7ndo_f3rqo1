@@ -12,7 +12,7 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Literal, Any, Dict
 
 # Example schemas (replace with your own):
 
@@ -40,6 +40,29 @@ class Product(BaseModel):
 
 # Add your own schemas here:
 # --------------------------------------------------
+
+class Quote(BaseModel):
+    """
+    Insurance quote submissions and results
+    Collection name: "quote"
+    """
+    quote_type: Literal["auto", "home"] = Field(..., description="Type of insurance quote")
+    zip_code: str = Field(..., description="US ZIP code")
+    age: Optional[int] = Field(None, ge=16, le=120, description="Customer age")
+
+    # Auto-specific
+    vehicle_year: Optional[int] = Field(None, ge=1980, le=2100)
+    vehicle_make: Optional[str] = None
+    vehicle_model: Optional[str] = None
+    accidents_last_5_years: Optional[int] = Field(None, ge=0, le=10)
+
+    # Home-specific
+    home_value: Optional[float] = Field(None, ge=0)
+    square_feet: Optional[int] = Field(None, ge=100)
+    security_system: Optional[bool] = None
+
+    # Results returned from pricing engine
+    results: Optional[List[Dict[str, Any]]] = Field(default=None, description="Carrier quotes returned to user")
 
 # Note: The Flames database viewer will automatically:
 # 1. Read these schemas from GET /schema endpoint
